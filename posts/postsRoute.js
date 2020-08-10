@@ -61,7 +61,7 @@ router.post("/api/posts", (req, res) => {
         })
 });*/
 
-router.post('/api/posts', async (req, res) => {
+router.post("/api/posts", async (req, res) => {
     try {
       const { title, contents } = req.body;
   
@@ -73,10 +73,10 @@ router.post('/api/posts', async (req, res) => {
   
       res.status(201).json({ ...post, title, contents });
     } catch (err) {
-      res.status(500).json({ error: "There was an error while saving the post to the database" });
+      res.status(500).json({ message: "There was an error while saving the post to the database" });
     }
   });
-
+/*
 router.post("/api/posts/:id/comments", (req, res) => {
     const id = req.params.id;
     const post = db.findById(req.params.id);
@@ -94,9 +94,32 @@ router.post("/api/posts/:id/comments", (req, res) => {
     }).then(comment => res.status(201).json(comment))
         .catch(err => {
             console.log(err.stack);
-            res.status(500).json({error: "There was an error while saving the comment to the database"});
-        });
-});
+            res.status(500).json({ message: "There was an error while saving the comment to the database"});
+        })
+}); */
+
+router.post("/api/posts/:id/comments", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { text } = req.body;
+      const post = await db.findById(id)
+  
+      if (!post.length) {
+        return res.status(404).json({ message: "The post with the specified ID does not exist." });
+      }
+  
+      if(!text) {
+        return res.status(400).json({ message: "Please provide text for the comment." });
+      }
+  
+      const commentId = await db.insertComment({ post_id: id, text });
+      const comment = await db.findCommentById(commentId.id);
+  
+      res.status(201).json(comment);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error while saving the comment to the database" });
+    }
+  });
 
 /************************Delete request  *********************************************************************************************/
 router.delete("/api/posts/:id", (req, res) => {
