@@ -48,6 +48,7 @@ router.get("/api/posts/:id/comments", (req,res) => {
 });
 
 /*************Post calls  ***********************************************************************************************************/
+/*
 router.post("/api/posts", (req, res) => {
     if (!req.body.title || !req.body.contents) {
         return res.status(400).json({ message: "Please provide title and contents for the post."});
@@ -58,7 +59,23 @@ router.post("/api/posts", (req, res) => {
             console.log(err);
             res.status(500).json({ message: "There was an error while saving the post to the database"});
         })
-});
+});*/
+
+router.post('/api/posts', async (req, res) => {
+    try {
+      const { title, contents } = req.body;
+  
+      if(!title || !contents) {
+        return res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
+      }
+  
+      const post = await db.insert({ title, contents });
+  
+      res.status(201).json({ ...post, title, contents });
+    } catch (err) {
+      res.status(500).json({ error: "There was an error while saving the post to the database" });
+    }
+  });
 
 router.post("/api/posts/:id/comments", (req, res) => {
     const id = req.params.id;
