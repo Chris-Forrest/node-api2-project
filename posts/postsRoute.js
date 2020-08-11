@@ -62,7 +62,7 @@ router.post("/api/posts", (req, res) => {
         })
 });
 
-router.post("./api/posts/:id/comments", (req, res) => {
+router.post("/api/posts/:id/comments", (req, res) => {
     if(!req.body.text){
         return res.status(400).json({ mesage: "Please provide text for the comment."})
     }
